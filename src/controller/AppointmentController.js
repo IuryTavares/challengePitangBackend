@@ -50,6 +50,7 @@ class AppointmentController {
     const appointment = {
       name,
       birthDate,
+      hasVaccined: false,
       vaccineDate: new Date(vaccineDate),
       id: crypto.randomUUID(),
       timeSlots: {
@@ -68,24 +69,31 @@ class AppointmentController {
     }
 
     let contador = 1;
-    Appointments.forEach((element) => {
-      if (element.vaccineDate.getDate() === parsedDate.getDate()
-      && element.vaccineDate.getMonth() === parsedDate.getMonth()) {
+    for (let index = 0; index < Appointments.length; index += 1) {
+      if (Appointments[index].vaccineDate.getDate() === parsedDate.getDate()
+      && Appointments[index].vaccineDate.getMonth() === parsedDate.getMonth()) {
         if (contador >= 20) {
-          return response.status(404).json({ message: 'No appointments available on the day' });
+          response.status(404).json({ message: 'No appointments available on the day' });
+          return;
         }
-        if (element.timeSlots.hour === getHours(parsedDate)) {
-          if (element.timeSlots.availability > 0) {
-            element.timeSlots.availability -= 1;
-            element.isAvaliable = false;
-            Appointments.push(element);
-            return response.status(200).json({ message: 'Appointment created with sucess' });
+        if (Appointments[index].timeSlots.hour === getHours(parsedDate)) {
+          if (Appointments[index].timeSlots.availability > 0) {
+            Appointments[index].timeSlots.availability -= 1;
+            appointment.timeSlots.availability = 0;
+            Appointments.push(appointment);
+            response.status(200).json({ message: 'Appointment created with sucess' });
+            return;
           }
-          return response.status(404).json({ message: 'No appointment available at this time' });
+          response.status(404).json({ message: 'No appointment available at this time' });
+          return;
         }
         contador += 1;
       }
-    });
+    }
+
+    if (appointment.timeSlots.availability === 0) {
+      return;
+    }
 
     appointment.timeSlots.availability -= 1;
     Appointments.push(appointment);
@@ -95,9 +103,9 @@ class AppointmentController {
 
   remove(request, response) {
     const { id } = request.params;
-    console.log(id);
+
     const appointmentIndex = Appointments.findIndex((appointment) => appointment.id === id);
-    console.log(appointmentIndex);
+
     if (appointmentIndex < 0) {
       return response.status(400).json({ error: 'appointment not exist' });
     }
@@ -109,19 +117,27 @@ class AppointmentController {
 
   update(request, response) {
     const { id } = request.params;
-    const { name, birthDate, vaccineDate } = request.body;
+    const {
+      name, birthDate, vaccineDate, hasVaccined, timeSlots,
+    } = request.body;
 
     const appointmentIndex = Appointments.findIndex((appointment) => appointment.id === id);
 
     if (appointmentIndex < 0) {
-      return response.status(400).json({ error: 'appointment not exist' });
+      return response.status(400).json({ error: 'Appointment not exist' });
+    }
+
+    if (hasVaccined) {
+      return response.status(400).json({ message: 'Already vacinned' });
     }
 
     const appointment = {
       id,
       name,
-      birthDate,
-      vaccineDate,
+      birthDate: new Date(birthDate),
+      hasVaccined: true,
+      vaccineDate: new Date(vaccineDate),
+      timeSlots,
     };
 
     Appointments[appointmentIndex] = appointment;
