@@ -1,4 +1,5 @@
-import crypto from 'crypto';
+const crypto = require('crypto');
+// import crypto from 'crypto';
 
 const timeSlots = {
   hour: new Date(),
@@ -10,8 +11,8 @@ const Appointments = [{
   name: 'iury',
   birthDate: new Date(),
   vaccineDate: new Date(1995, 11, 17, 3, 24, 0),
-  isAvaliable: false,
+  isVaccined: false,
   timeSlots,
 }];
 
-export default Appointments;
+module.exports = Appointments;

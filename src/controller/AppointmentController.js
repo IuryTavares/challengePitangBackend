@@ -1,11 +1,15 @@
 /* eslint-disable no-const-assign */
 /* eslint-disable consistent-return */
-
+const crypto = require('crypto');
+const { getHours } = require('date-fns');
+const Joi = require('joi');
+const Appointments = require('../model/AppointmentModel.js');
+/*
 import crypto from 'crypto';
 import { getHours } from 'date-fns';
 import Joi from 'joi';
 import Appointments from '../model/AppointmentModel.js';
-
+*/
 const schema = Joi.object({
   name: Joi.string().required().min(3).max(50),
   birthDate: Joi.date().required(),
@@ -48,11 +52,11 @@ class AppointmentController {
     const parsedDate = new Date(vaccineDate);
 
     const appointment = {
+      id: crypto.randomUUID(),
       name,
       birthDate,
       hasVaccined: false,
       vaccineDate: new Date(vaccineDate),
-      id: crypto.randomUUID(),
       timeSlots: {
         hour: getHours(new Date(vaccineDate)),
         availability: 2,
@@ -112,7 +116,7 @@ class AppointmentController {
 
     Appointments.slice(appointmentIndex, 1);
 
-    return response.status(204).send();
+    return response.status(204).json({ message: 'Appointment deleted' });
   }
 
   update(request, response) {
@@ -146,4 +150,4 @@ class AppointmentController {
   }
 }
 
-export default AppointmentController;
+module.exports = AppointmentController;

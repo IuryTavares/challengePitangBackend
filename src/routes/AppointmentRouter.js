@@ -1,6 +1,9 @@
+const Router = require('express');
+const AppointmentController = require('../controller/AppointmentController.js');
+/*
 import { Router } from 'express';
 import AppointmentController from '../controller/AppointmentController.js';
-
+*/
 const appointmentController = new AppointmentController();
 const router = Router();
 
@@ -10,4 +13,4 @@ router.put('/appointment/:id', appointmentController.update.bind(appointmentCont
 router.post('/appointment', appointmentController.store.bind(appointmentController));
 router.delete('/appointment/:id', appointmentController.remove.bind(appointmentController));
 
-export default router;
+module.exports = router;
